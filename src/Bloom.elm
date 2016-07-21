@@ -1,16 +1,41 @@
 module Bloom exposing 
-  ( empty
+  ( Filter
+  , empty
   , add
   , test
   )
+
+{-| Elm module for 
+
+@docs Filter
+
+# API
+
+@docs empty, add, test
+
+-}
 
 import Array exposing (Array)
 import Murmur3 exposing (hashString)
 
 
-type alias Filter = Array Int
+{-| Filter
+
+    type alias Filter = 
+      Array Int
+-}
+type alias Filter = 
+  Array Int
 
 
+{-| Empty
+
+    import Bloom
+
+    Bloom.empty 10 |> Array.toList
+
+    -- [0,0,0,0,0,0,0,0,0,0]
+-}
 empty : Int -> Filter
 empty m =
   Array.initialize m (always 0)
@@ -24,9 +49,17 @@ hashes k m word =
   in
     List.map 
       (\i -> (hash1 + i * hash2) % m |> abs) 
-      [0..k]
+      [1..k]
 
 
+{-| Add
+
+    import Bloom exposing (add, empty)
+
+    add' = add 3
+
+    t = List.foldr add' (empty 20) ["foo", "bar", "baz"]
+-}
 add : Int -> String -> Filter -> Filter
 add k word set =
   let
@@ -38,6 +71,16 @@ add k word set =
       (hashes k m word)
 
 
+{-| Test
+
+    import Bloom exposing (add, empty)
+
+    -- create filter t with k = 3
+    test' = test 3
+
+    test' "foo" t == True
+    test' "fou" t == False
+-}
 test : Int -> String -> Filter -> Bool
 test k word set =
   let 
