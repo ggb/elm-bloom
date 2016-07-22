@@ -5,11 +5,31 @@ module Bloom exposing
   , test
   )
 
-{-| Elm module for 
+{-| Elm [Bloom filter](https://en.wikipedia.org/wiki/Bloom_filter) implementation using [Murmur3](https://en.wikipedia.org/wiki/MurmurHash). It may not be the fastest implementation, but it is simple and easy to use. This [blog post](https://corte.si/posts/code/bloom-filter-rules-of-thumb/index.html) with rules of thumb for choosing m and k might be helpful. 
+
+Use it as follows:
+
+    import Bloom exposing (empty, add, test)
+
+    -- create an empty filter with m elements and k hashes
+    emptyFilter = empty 1000 4
+
+    -- add elements to the filter
+    filter = 
+      List.foldr 
+        add
+        emptyFilter 
+        ["foo", "bar", "baz", ... ]
+
+    -- check if elements are recognized by the filter
+    test "bar" filter == True
+    test "barr" filter == False
+
+# Data
 
 @docs Filter
 
-# API
+# Create, manipulate and test
 
 @docs empty, add, test
 
@@ -19,13 +39,7 @@ import Array exposing (Array)
 import Murmur3 exposing (hashString)
 
 
-{-| Filter
-
-    type alias Filter = 
-      { set: Array Int
-      , m: Int
-      , k: Int
-      }
+{-| The Filter struct holds an array containing the actual filter, but also the values for m and k (for simplicity).
 -}
 type alias Filter = 
   { set: Array Int
@@ -34,7 +48,7 @@ type alias Filter =
   }
 
 
-{-| Empty
+{-| Creates an empty Filter, containing m elements and using k hashes.
 
     import Bloom
 
@@ -69,7 +83,7 @@ updateFilter m k newSet =
   }
 
 
-{-| Add
+{-| Adds elements to an existing Filter.
 
     import Bloom exposing (add, empty)
 
@@ -84,7 +98,7 @@ add word {m, k, set} =
   |> updateFilter m k
 
 
-{-| Test
+{-| Tests if a filter contains an element. By its probalistic nature this function may yield false positive results.
 
     import Bloom exposing (add, empty)
 

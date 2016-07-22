@@ -1,12 +1,14 @@
 {
     "version": "1.0.0",
-    "summary": "helpful summary of your project, less than 80 characters",
-    "repository": "https://github.com/user/project.git",
-    "license": "BSD3",
+    "summary": "Elm Bloom filter implementation using Murmur3",
+    "repository": "https://github.com/ggb/elm-bloom.git",
+    "license": "MIT",
     "source-directories": [
         "src/"
     ],
-    "exposed-modules": [],
+    "exposed-modules": [
+        "Bloom"
+    ],
     "dependencies": {
         "Skinney/murmur3": "2.0.2 <= v < 3.0.0",
         "elm-lang/core": "4.0.3 <= v < 5.0.0"
