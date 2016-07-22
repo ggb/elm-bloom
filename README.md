@@ -15,10 +15,10 @@ import Bloom exposing (empty, add, test)
 
 filter = 
   List.foldr 
-    (add 4) 
-    (empty 1000) 
+    add
+    (empty 1000 4) 
     ["foo", "bar", "baz", ... ]
 
--- test 4 "bar" filter == True
--- test 4 "barr" filter == False
+-- test "bar" filter == True
+-- test "barr" filter == False
 ```

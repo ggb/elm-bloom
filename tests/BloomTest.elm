@@ -53,22 +53,22 @@ line s =
 tests : String
 tests =
   let
-    s = List.foldr (add 3) (empty 20) ["foo","bar","baz"]
-    t = List.foldr (add 4) (empty 1000) longText |> Debug.log "t"
-    checkT = List.map (\w -> Bloom.test 4 w t) longText
+    s = List.foldr add (empty 20 3) ["foo","bar","baz"]
+    t = List.foldr add (empty 1000 4) longText |> Debug.log "t"
+    checkT = List.map (\w -> Bloom.test w t) longText
   in
     suite "Bloom Filter"
-      [ defaultTest (assertEqual [] (empty 0 |> Array.toList))
-      , defaultTest (assertEqual [0,0,0,0,0,0,0,0,0,0] (empty 10 |> Array.toList))
-      , defaultTest (assertEqual True (Bloom.test 3 "foo" s))
-      , defaultTest (assertEqual True (Bloom.test 3 "bar" s))
-      , defaultTest (assertEqual True (Bloom.test 3 "baz" s))
-      , defaultTest (assertEqual False (Bloom.test 3 "fuo" s))
-      , defaultTest (assertEqual False (Bloom.test 3 "bas" s))
-      , defaultTest (assertEqual False (Bloom.test 3 "bak" s))
+      [ defaultTest (assertEqual [] (empty 0 0 |> .set |> Array.toList))
+      , defaultTest (assertEqual [0,0,0,0,0,0,0,0,0,0] (empty 10 3 |> .set |> Array.toList))
+      , defaultTest (assertEqual True (Bloom.test "foo" s))
+      , defaultTest (assertEqual True (Bloom.test "bar" s))
+      , defaultTest (assertEqual True (Bloom.test "baz" s))
+      , defaultTest (assertEqual False (Bloom.test "fuo" s))
+      , defaultTest (assertEqual False (Bloom.test "bas" s))
+      , defaultTest (assertEqual False (Bloom.test "bak" s))
       , defaultTest (assertEqual True (List.all identity checkT))
-      , defaultTest (assertEqual False (Bloom.test 4 "jorge" t))
-      , defaultTest (assertEqual False (Bloom.test 4 "luis" t))
-      , defaultTest (assertEqual False (Bloom.test 4 "borges" t))
+      , defaultTest (assertEqual False (Bloom.test "jorge" t))
+      , defaultTest (assertEqual False (Bloom.test "luis" t))
+      , defaultTest (assertEqual False (Bloom.test "borges" t))
       ]
     |> stringRunner

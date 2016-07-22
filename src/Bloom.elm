@@ -22,23 +22,32 @@ import Murmur3 exposing (hashString)
 {-| Filter
 
     type alias Filter = 
-      Array Int
+      { set: Array Int
+      , m: Int
+      , k: Int
+      }
 -}
 type alias Filter = 
-  Array Int
+  { set: Array Int
+  , m: Int
+  , k: Int
+  }
 
 
 {-| Empty
 
     import Bloom
 
-    Bloom.empty 10 |> Array.toList
+    Bloom.empty 10 3 |> Array.toList
 
-    -- [0,0,0,0,0,0,0,0,0,0]
+    -- {m=10, k=3, set=[0,0,0,0,0,0,0,0,0,0]}
 -}
-empty : Int -> Filter
-empty m =
-  Array.initialize m (always 0)
+empty : Int -> Int -> Filter
+empty m k =
+  { set = Array.initialize m (always 0)
+  , m = m
+  , k = k
+  }
 
 
 hashes : Int -> Int -> String -> List Int
@@ -52,40 +61,40 @@ hashes k m word =
       [1..k]
 
 
+updateFilter : Int -> Int -> Array Int -> Filter
+updateFilter m k newSet =
+  { set = newSet
+  , m = m
+  , k = k
+  }
+
+
 {-| Add
 
     import Bloom exposing (add, empty)
 
-    add' = add 3
-
-    t = List.foldr add' (empty 20) ["foo", "bar", "baz"]
+    t = List.foldr add (empty 20 3) ["foo", "bar", "baz"]
 -}
-add : Int -> String -> Filter -> Filter
-add k word set =
-  let
-    m = Array.length set
-  in
-    List.foldr 
-      (\pos acc -> Array.set pos 1 acc) 
-      set 
-      (hashes k m word)
+add : String -> Filter -> Filter
+add word {m, k, set} = 
+  List.foldr 
+    (\pos acc -> Array.set pos 1 acc) 
+    set 
+    (hashes k m word)
+  |> updateFilter m k
 
 
 {-| Test
 
     import Bloom exposing (add, empty)
 
-    -- create filter t with k = 3
-    test' = test 3
-
-    test' "foo" t == True
-    test' "fou" t == False
+    -- create filter t
+    
+    test "foo" t == True
+    test "fou" t == False
 -}
-test : Int -> String -> Filter -> Bool
-test k word set =
-  let 
-    m = Array.length set
-  in
-    hashes k m word
-    |> List.map (\pos -> Array.get pos set)
-    |> List.all (\entry -> entry == Just 1)
+test : String -> Filter -> Bool
+test word {m, k, set} =
+  hashes k m word
+  |> List.map (\pos -> Array.get pos set)
+  |> List.all (\entry -> entry == Just 1)
