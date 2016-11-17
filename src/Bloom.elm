@@ -70,9 +70,10 @@ hashes k m word =
     hash1 = hashString 0 word
     hash2 = hashString hash1 word
   in
-    List.map 
-      (\i -> (hash1 + i * hash2) % m |> abs) 
-      [1..k]
+    k
+    |> List.range 1 
+    |> List.map (\i -> (hash1 + i * hash2) % m |> abs) 
+      
 
 
 updateFilter : Int -> Int -> Array Int -> Filter
