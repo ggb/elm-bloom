@@ -72,7 +72,7 @@ hashes k m word =
   in
     k
     |> List.range 1 
-    |> List.map (\i -> (hash1 + i * hash2) % m |> abs) 
+    |> List.map (\i -> modBy m (hash1 + i * hash2) |> abs) 
       
 
 

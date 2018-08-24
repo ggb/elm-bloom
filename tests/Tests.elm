@@ -4,13 +4,13 @@ import Test exposing (..)
 import Expect
 import String
 import Bloom exposing (empty, add)
-import Regex exposing (HowMany(All), regex)
+import Regex exposing (Regex)
 import Array
 
 
 createTest : a -> ( b, b ) -> Test
 createTest i (expected, result) = 
-  test ("Test " ++ (toString i)) <|
+  test ("Test " ++ (Debug.toString i)) <|
     \() -> 
         Expect.equal expected result
 
@@ -19,12 +19,18 @@ createSuite : ( String, List ( a, a ) ) -> Test
 createSuite (suiteName, cases) = 
   describe suiteName (List.indexedMap createTest cases)
 
+      
+regex : String -> Regex
+regex str =
+  Maybe.withDefault Regex.never <|
+    Regex.fromString str 
+
 
 trim : String -> String
 trim word =
   word
-  |> Regex.replace All (regex "^\\W+") (\_ -> "")
-  |> Regex.replace All (regex "\\W+$") (\_ -> "")
+  |> Regex.replace (regex "^\\W+") (\_ -> "")
+  |> Regex.replace (regex "\\W+$") (\_ -> "")
 
 
 tokenize : String -> List String
@@ -50,7 +56,7 @@ the set, the larger the probability of false positives.
 
 testCreate : ( String, List ( List number, List Int ) )
 testCreate =
-    (,) "Create Bloom Filter"
+    Tuple.pair "Create Bloom Filter"
     [ ([], (empty 0 0 |> .set |> Array.toList))
     , ([0,0,0,0,0,0,0,0,0,0], (empty 10 3 |> .set |> Array.toList))
     ] 
@@ -63,7 +69,7 @@ testFilter =
         t = List.foldr add (empty 1000 4) longText |> Debug.log "t"
         checkT = List.map (\w -> Bloom.test w t) longText
     in
-        (,) "Use Bloom Filter"
+        Tuple.pair "Use Bloom Filter"
         [ (True, (Bloom.test "foo" s))
         , (True, (Bloom.test "bar" s))
         , (True, (Bloom.test "baz" s))
