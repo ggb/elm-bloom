@@ -66,7 +66,7 @@ testFilter : ( String, List ( Bool, Bool ) )
 testFilter = 
     let
         s = List.foldr add (empty 20 3) ["foo","bar","baz"]
-        t = List.foldr add (empty 1000 4) longText |> Debug.log "t"
+        t = List.foldr add (empty 1000 4) longText
         checkT = List.map (\w -> Bloom.test w t) longText
     in
         Tuple.pair "Use Bloom Filter"
