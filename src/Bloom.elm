@@ -35,6 +35,10 @@ Use it as follows:
 
 @docs empty, add, test
 
+# JSON
+
+@docs decoder, encoder
+
 -}
 
 import Array exposing (Array)
