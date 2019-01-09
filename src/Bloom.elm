@@ -3,6 +3,8 @@ module Bloom exposing
   , empty
   , add
   , test
+  , decoder
+  , encoder
   )
 
 {-| Elm [Bloom filter](https://en.wikipedia.org/wiki/Bloom_filter) implementation using [Murmur3](https://en.wikipedia.org/wiki/MurmurHash). It may not be the fastest implementation, but it is simple and easy to use. This [blog post](https://corte.si/posts/code/bloom-filter-rules-of-thumb/index.html) with rules of thumb for choosing m and k might be helpful. 
@@ -33,10 +35,16 @@ Use it as follows:
 
 @docs empty, add, test
 
+# JSON
+
+@docs decoder, encoder
+
 -}
 
 import Array exposing (Array)
 import Murmur3 exposing (hashString)
+import Json.Decode as D
+import Json.Encode as E
 
 
 {-| The Filter struct holds an array containing the actual filter, but also the values for m and k (for simplicity).
@@ -113,3 +121,25 @@ test word {m, k, set} =
   hashes k m word
   |> List.map (\pos -> Array.get pos set)
   |> List.all (\entry -> entry == Just 1)
+  
+
+{-| JSON decoder for a Filter
+-}
+decoder : D.Decoder Filter
+decoder =
+  D.map3 Filter
+    ( D.field "set" <| D.array D.int )
+    ( D.field "m" D.int )
+    ( D.field "k" D.int )
+  
+
+{-| Encodes a filter into a JSON value.
+-}
+encoder : Filter -> E.Value
+encoder filter =
+  E.object
+    [ ( "set", E.array E.int filter.set )
+    , ( "m", E.int filter.m )
+    , ( "k", E.int filter.k )
+    ]
+    
